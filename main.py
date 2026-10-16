@@ -2,16 +2,15 @@ import os
 import asyncio
 from pathlib import Path
 import instaloader
-from pyrobale import Client, FSInputFile
+from pyrobale import Client, InputFile
 
 # --- خواندن اطلاعات از محیط (Secrets در GitHub) ---
 BALE_BOT_TOKEN = os.environ.get("BALE_BOT_TOKEN")
 BALE_CHAT_ID = os.environ.get("BALE_CHAT_ID")
-IG_USERNAME = os.environ.get("IG_USERNAME")  # اکانت خودت برای لاگین (اختیاری)
+IG_USERNAME = os.environ.get("IG_USERNAME")
 IG_PASSWORD = os.environ.get("IG_PASSWORD")
-TARGET_USERNAME = os.environ.get("TARGET_USERNAME")  # پیج هدف
+TARGET_USERNAME = os.environ.get("TARGET_USERNAME")
 
-# فایل برای ذخیره آخرین استوری دانلود شده (در خود ریپازیتوری)
 LAST_STORY_FILE = Path("last_story.txt")
 
 def get_last_story_id():
@@ -25,7 +24,6 @@ def save_last_story_id(story_id):
 async def main():
     L = instaloader.Instaloader()
 
-    # لاگین به اینستاگرام (اگر پیج خصوصی باشد یا برای اطمینان)
     if IG_USERNAME and IG_PASSWORD:
         try:
             L.login(IG_USERNAME, IG_PASSWORD)
@@ -42,7 +40,6 @@ async def main():
     last_id = get_last_story_id()
     found_new = False
 
-    # ساخت کلاینت بله
     bot = Client(BALE_BOT_TOKEN)
 
     for story in L.get_stories(userids=[profile.userid]):
@@ -62,18 +59,17 @@ async def main():
 
             file_path = downloaded_files[0]
 
-            # --- ارسال به بله ---
             try:
                 if file_path.suffix.lower() == ".mp4":
-                    await bot.send_video(BALE_CHAT_ID, FSInputFile(str(file_path)))
+                    await bot.send_video(BALE_CHAT_ID, InputFile(str(file_path)))
                 else:
-                    await bot.send_photo(BALE_CHAT_ID, FSInputFile(str(file_path)))
+                    await bot.send_photo(BALE_CHAT_ID, InputFile(str(file_path)))
                 print(f"Sent to Bale: {file_path.name}")
             except Exception as e:
                 print(f"Bale send error: {e}")
 
             save_last_story_id(story_id)
-            file_path.unlink()  # پاک کردن فایل بعد از ارسال
+            file_path.unlink()
 
     if not found_new:
         print("No new stories.")
