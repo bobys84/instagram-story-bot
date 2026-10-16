@@ -4,7 +4,6 @@ from pathlib import Path
 import instaloader
 from pyrobale import Client, InputFile
 
-# --- خواندن اطلاعات از محیط (Secrets در GitHub) ---
 BALE_BOT_TOKEN = os.environ.get("BALE_BOT_TOKEN")
 BALE_CHAT_ID = os.environ.get("BALE_CHAT_ID")
 IG_USERNAME = os.environ.get("IG_USERNAME")
